@@ -1,0 +1,17 @@
+---
+# Playbook utama untuk deploy NoteForge dengan monitoring
+- name: Deploy NoteForge Application
+  hosts: app_servers
+  become: yes
+  roles:
+    # - docker  # Skip karena sudah terinstall
+    - app
+    - node_exporter
+
+- name: Setup Monitoring Infrastructure
+  hosts: monitoring_servers
+  become: yes
+  roles:
+    # - docker  # Skip karena sudah terinstall
+    - prometheus
+    - grafana

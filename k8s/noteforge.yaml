@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: noteforge
-          image: evangelionz/noteforge:latest
+          image: noteforge-note-forge:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4173
