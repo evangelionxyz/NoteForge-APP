@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, googleProvider } from "../lib/firebase";
 import type { User, UserCredential } from "firebase/auth";

@@ -134,9 +134,10 @@ export const NoteForge = () => {
     setMutationBusy(true)
     try {
       await apiDeleteNote(selectedNoteId)
-      const { [selectedNoteId]: _removed, ...rest } = notes
+      const nextNotes = { ...notes }
+      delete nextNotes[selectedNoteId]
       const nextOrder = noteIds.filter((id) => id !== selectedNoteId)
-      setNotes(rest)
+      setNotes(nextNotes)
       setNoteIds(nextOrder)
       const nextSelected = nextOrder[0] ?? null
       setSelectedNoteId(nextSelected)
