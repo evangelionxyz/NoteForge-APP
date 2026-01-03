@@ -62,6 +62,8 @@ export const NoteForge = () => {
   const [signOutBusy, setSignOutBusy] = useState(false)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const isLoading = apiUserLoading || loadingNotes
+
   // Load notes when backend user is ready
   useEffect(() => {
     const load = async () => {
@@ -108,6 +110,7 @@ export const NoteForge = () => {
       const id = newNoteId()
       const created = await apiCreateNote({
         id,
+        userId: apiUser.userId,
         title: 'New note',
         colorCode: '#808080', // default color
         descriptions: '',
@@ -263,6 +266,12 @@ export const NoteForge = () => {
 
   return (
     <div className="nf-app" role="application" aria-label="NoteForge">
+      {isLoading ? (
+        <div className="nf-loading-overlay" aria-live="polite" aria-busy="true">
+          <div className="nf-spinner" aria-hidden="true" />
+          <span className="nf-loading-text">Loading your notes…</span>
+        </div>
+      ) : null}
       <header className="nf-header">
         <div className="nf-brand">
           <div className="nf-title">NoteForge</div>

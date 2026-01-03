@@ -30,33 +30,48 @@ export const AuthBoarding = () => {
         }
     }
 
+    const buttonLabel = busy ? 'Signing in…' : 'Continue with Google'
+
     return (
-        <div style={{ maxWidth: 520, margin: '48px auto', padding: 16 }}>
-            <h1 style={{ margin: 0 }}>NoteForge</h1>
-            <p style={{ marginTop: 8, opacity: 0.8 }}>Sign in to continue.</p>
+        <div className="nf-auth-root">
+            <div className="nf-auth-card" role="dialog" aria-labelledby="nf-auth-title">
+                <div className="nf-auth-header">
+                    <h1 id="nf-auth-title" className="nf-auth-title">NoteForge</h1>
+                    <p className="nf-auth-subtitle">Capture quick notes and tasks, synced to your account.</p>
+                </div>
 
-            {currentUser ? (
-                <div style={{ display: 'grid', gap: 12 }}>
-                    <div>
-                        <div style={{ fontSize: 12, opacity: 0.7 }}>Signed in as</div>
-                        <div>{currentUser.displayName ?? currentUser.email ?? currentUser.uid}</div>
+                {currentUser ? (
+                    <div className="nf-auth-content">
+                        <div className="nf-auth-account">
+                            <div className="nf-auth-account-label">Signed in as</div>
+                            <div className="nf-auth-account-name">{currentUser.displayName ?? currentUser.email ?? currentUser.uid}</div>
+                        </div>
+
+                        <button className="nf-button nf-button--ghost" onClick={handleSignOut} disabled={busy}>
+                            Sign out
+                        </button>
                     </div>
+                ) : (
+                    <div className="nf-auth-content">
+                        <button
+                            type="button"
+                            className="nf-button nf-button--google"
+                            onClick={handleSignIn}
+                            disabled={busy}
+                        >
+                            <span className="nf-google-logo" aria-hidden="true">G</span>
+                            <span>{buttonLabel}</span>
+                        </button>
+                        <p className="nf-auth-hint">We only use your Google account to authenticate and sync your notes.</p>
+                    </div>
+                )}
 
-                    <button onClick={handleSignOut} disabled={busy}>
-                        Sign out
-                    </button>
-                </div>
-            ) : (
-                <button onClick={handleSignIn} disabled={busy}>
-                    Continue with Google
-                </button>
-            )}
-
-            {error ? (
-                <div style={{ marginTop: 12, color: '#b91c1c' }} role="alert">
-                    {error}
-                </div>
-            ) : null}
+                {error ? (
+                    <div className="nf-auth-error" role="alert">
+                        {error}
+                    </div>
+                ) : null}
+            </div>
         </div>
     )
 }
