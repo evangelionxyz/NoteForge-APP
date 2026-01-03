@@ -14,7 +14,6 @@ export type ApiUser = {
 
 export type ApiNoteTask = {
   title: string;
-  colorCode: string;
   completed: boolean;
 };
 

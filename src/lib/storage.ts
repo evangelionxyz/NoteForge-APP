@@ -77,7 +77,7 @@ export function createNote(
     content: '',
     tasks: [],
     isCompleted: false,
-    color: '#808080',
+    colorCode: '#808080',
     createdAt: now,
     updatedAt: now,
   }
@@ -94,7 +94,7 @@ export function createNote(
 export function updateNote(
   notes: Record<string, Note>,
   id: string,
-  patch: Partial<Pick<Note, 'title' | 'content' | 'tasks' | 'isCompleted' | 'color'>>,
+  patch: Partial<Pick<Note, 'title' | 'content' | 'tasks' | 'isCompleted' | 'colorCode'>>,
 ): { notes: Record<string, Note> } {
   const current = notes[id]
   if (!current) return { notes }
@@ -105,7 +105,7 @@ export function updateNote(
     content: patch.content ?? current.content,
     tasks: patch.tasks ?? current.tasks,
     isCompleted: patch.isCompleted ?? current.isCompleted,
-    color: patch.color ?? current.color,
+    colorCode: patch.colorCode ?? current.colorCode,
     updatedAt: Date.now(),
   }
 
@@ -223,7 +223,7 @@ function normalizeNote(id: string, value: unknown): Note | null {
   const createdAt = typeof v.createdAt === 'number' ? v.createdAt : Date.now()
   const updatedAt = typeof v.updatedAt === 'number' ? v.updatedAt : createdAt
   const isCompleted = typeof v.isCompleted === 'boolean' ? v.isCompleted : false
-  const color = typeof v.color === 'string' ? v.color : '#808080'
+  const colorCode = typeof v.colorCode === 'string' ? v.colorCode : '#808080'
 
   const tasksRaw = Array.isArray(v.tasks) ? (v.tasks as unknown[]) : []
   const tasks: NoteTask[] = tasksRaw
@@ -242,10 +242,10 @@ function normalizeNote(id: string, value: unknown): Note | null {
   const normalized: Note = {
     id,
     title,
+    colorCode,
     content,
     tasks,
     isCompleted: isCompleted && tasks.length > 0 ? tasks.every((t) => t.done) : isCompleted,
-    color,
     createdAt,
     updatedAt,
   }

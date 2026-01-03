@@ -27,23 +27,23 @@ const apiNoteToUi = (note: ApiNote): Note => {
   const tasks: NoteTask[] = (note.tasks ?? []).map((t, idx) => ({
     id: `${note.id}-task-${idx}`,
     text: t.title,
-    colorCode: t.colorCode ?? note.colorCode ?? '#808080',
+    colorCode: note.colorCode ?? '#808080',
     done: t.completed,
   }))
 
   return {
     id: note.id,
     title: note.title,
+    colorCode: note.colorCode ?? '#808080',
     content: note.descriptions ?? '',
     tasks,
     isCompleted: note.completed,
-    colorCode: note.colorCode ?? '#808080',
     createdAt,
     updatedAt,
   }
 }
 
-const uiTasksToApi = (tasks: NoteTask[]): ApiNoteTask[] => tasks.map((t) => ({ title: t.text, colorCode: t.colorCode, completed: t.done }))
+const uiTasksToApi = (tasks: NoteTask[]): ApiNoteTask[] => tasks.map((t) => ({ title: t.text, completed: t.done }))
 
 const canMarkComplete = (note: Note): boolean => note.tasks.length > 0 && note.tasks.every((t) => t.done)
 
@@ -215,7 +215,7 @@ export const NoteForge = () => {
     const trimmed = newTaskText.trim()
     if (!trimmed) return
     const nextTasks: NoteTask[] = [
-      { id: newId('task'), text: trimmed, colorCode: current.colorCode, done: false },
+      { id: newId('task'), text: trimmed, done: false },
       ...current.tasks,
     ]
     setNewTaskText('')
