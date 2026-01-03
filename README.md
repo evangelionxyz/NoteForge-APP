@@ -1,73 +1,118 @@
-# React + TypeScript + Vite
+# Note Forge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite app with Firebase (Auth/Firestore/Storage). The app can run locally, in Docker, and be deployed to Kubernetes. GitHub Actions builds and pushes the Docker image to Docker Hub.
 
-Currently, two official plugins are available:
+## 1. Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 22+
+- npm
+- Docker Desktop (for Docker and local Kubernetes)
+- kubectl (usually comes with Docker Desktop)
 
-## React Compiler
+## 2. Local development (Vite dev server)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Install dependencies:
 
-## Expanding the ESLint configuration
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. Create a `.env.local` (or `.env.development`) in the project root:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+   ```bash
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=...
+   VITE_FIREBASE_PROJECT_ID=...
+   VITE_FIREBASE_STORAGE_BUCKET=...
+   VITE_FIREBASE_MESSAGING_SENDER_ID=...
+   VITE_FIREBASE_APP_ID=...
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. Run dev server:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   ```bash
+   npm run dev
+   ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. Open the app at http://localhost:5173.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 3. Run with Docker (local)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. Create `.env` in the project root (used by docker-compose):
+
+   ```bash
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=...
+   VITE_FIREBASE_PROJECT_ID=...
+   VITE_FIREBASE_STORAGE_BUCKET=...
+   VITE_FIREBASE_MESSAGING_SENDER_ID=...
+   VITE_FIREBASE_APP_ID=...
+   ```
+
+2. Build and run with Docker Compose:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+3. Open the app at http://localhost:8080.
+
+## 4. CI/CD (GitHub Actions → Docker Hub)
+
+Workflow: .github/workflows/ci.yml
+
+On push to master/dev, GitHub Actions will:
+
+- Install dependencies, lint, and build the app.
+- Build a Docker image using dockerfile.
+- Push the image to Docker Hub using DOCKERHUB_REPOSITORY, e.g. evangelionz/noteforge.
+
+Required GitHub repo configuration:
+
+- Secrets:
+  - VITE_FIREBASE_API_KEY
+  - VITE_FIREBASE_AUTH_DOMAIN
+  - VITE_FIREBASE_PROJECT_ID
+  - VITE_FIREBASE_STORAGE_BUCKET
+  - VITE_FIREBASE_MESSAGING_SENDER_ID
+  - VITE_FIREBASE_APP_ID
+  - DOCKERHUB_USERNAME
+  - DOCKERHUB_TOKEN
+- Variables:
+  - DOCKERHUB_REPOSITORY = evangelionz/noteforge
+
+The Kubernetes Deployment refers to the latest tag:
+
+- image: evangelionz/noteforge:latest
+
+## 5. Deploy to Kubernetes (local cluster via Docker Desktop)
+
+1. Enable Kubernetes in Docker Desktop settings.
+
+2. Apply the manifest:
+
+   ```bash
+   kubectl apply -f k8s/note-forge.yaml
+   ```
+
+3. Check resources:
+
+   ```bash
+   kubectl get deploy,pod,svc
+   ```
+
+4. Port-forward the service to localhost:
+
+   ```bash
+   kubectl port-forward svc/note-forge 8080:80
+   ```
+
+5. Open the app at http://localhost:8080.
+
+6. Delete resources when done:
+
+   ```bash
+   kubectl delete -f k8s/note-forge.yaml
+   ```
+
+This same image and manifest can be adapted for cloud Kubernetes clusters (GKE/AKS/EKS) by pointing them to the Docker Hub image evangelionz/noteforge.
