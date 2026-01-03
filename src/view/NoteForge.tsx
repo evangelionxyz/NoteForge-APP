@@ -27,6 +27,7 @@ const apiNoteToUi = (note: ApiNote): Note => {
   const tasks: NoteTask[] = (note.tasks ?? []).map((t, idx) => ({
     id: `${note.id}-task-${idx}`,
     text: t.title,
+    colorCode: t.colorCode ?? note.colorCode ?? '#808080',
     done: t.completed,
   }))
 
@@ -36,13 +37,13 @@ const apiNoteToUi = (note: ApiNote): Note => {
     content: note.descriptions ?? '',
     tasks,
     isCompleted: note.completed,
-    color: '#808080',
+    colorCode: note.colorCode ?? '#808080',
     createdAt,
     updatedAt,
   }
 }
 
-const uiTasksToApi = (tasks: NoteTask[]): ApiNoteTask[] => tasks.map((t) => ({ title: t.text, completed: t.done }))
+const uiTasksToApi = (tasks: NoteTask[]): ApiNoteTask[] => tasks.map((t) => ({ title: t.text, colorCode: t.colorCode, completed: t.done }))
 
 const canMarkComplete = (note: Note): boolean => note.tasks.length > 0 && note.tasks.every((t) => t.done)
 
@@ -59,6 +60,7 @@ export const NoteForge = () => {
   const colorPopoverRef = useRef<HTMLDetailsElement | null>(null)
   const userMenuRef = useRef<HTMLDetailsElement | null>(null)
   const [signOutBusy, setSignOutBusy] = useState(false)
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Load notes when backend user is ready
   useEffect(() => {
@@ -158,48 +160,51 @@ export const NoteForge = () => {
     setActivePane('editor')
   }
 
-  async function persistNote(noteId: string, patch: Partial<Pick<Note, 'title' | 'content' | 'tasks' | 'isCompleted'>>) {
-    const current = notes[noteId]
-    if (!current) return
-    setMutationBusy(true)
-    try {
+  function handleUpdateSelected(patch: Partial<Pick<Note, 'title' | 'content' | 'colorCode' | 'tasks' | 'isCompleted'>>) {
+    if (!selectedNoteId) return
+
+    setNotes((prev) => {
+      const current = prev[selectedNoteId]
+      if (!current) return prev
+
       const next: Note = {
         ...current,
         title: patch.title ?? current.title,
         content: patch.content ?? current.content,
         tasks: patch.tasks ?? current.tasks,
         isCompleted: patch.isCompleted ?? current.isCompleted,
+        colorCode: patch.colorCode ?? current.colorCode,
         updatedAt: Date.now(),
       }
-      setNotes({ ...notes, [noteId]: next })
 
-      await apiUpdateNote(noteId, {
-        title: next.title,
-        descriptions: next.content,
-        completed: next.isCompleted,
-        tasks: uiTasksToApi(next.tasks),
-      })
-    } catch (err) {
-      console.error('Failed to update note', err)
-    } finally {
-      setMutationBusy(false)
-    }
-  }
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
 
-  function handleUpdateSelected(patch: Partial<Pick<Note, 'title' | 'content' | 'color' | 'tasks' | 'isCompleted'>>) {
-    if (!selectedNoteId) return
-    // color is local-only
-    if (patch.color !== undefined) {
-      const current = notes[selectedNoteId]
-      if (!current) return
-      setNotes({ ...notes, [selectedNoteId]: { ...current, color: patch.color } })
-      return
-    }
-    void persistNote(selectedNoteId, patch)
+      saveTimeoutRef.current = setTimeout(async () => {
+        setMutationBusy(true)
+        try {
+          await apiUpdateNote(next.id, {
+            title: next.title,
+            colorCode: next.colorCode,
+            descriptions: next.content,
+            completed: next.isCompleted,
+            tasks: uiTasksToApi(next.tasks),
+          })
+        } catch (err) {
+          console.error('Failed to update note', err)
+        } finally {
+          setMutationBusy(false)
+          saveTimeoutRef.current = null
+        }
+      }, 500)
+
+      return { ...prev, [selectedNoteId]: next }
+    })
   }
 
   function handleSetSelectedColor(color: string) {
-    handleUpdateSelected({ color })
+    handleUpdateSelected({ colorCode: color })
     colorPopoverRef.current?.removeAttribute('open')
   }
 
@@ -209,7 +214,10 @@ export const NoteForge = () => {
     if (!current) return
     const trimmed = newTaskText.trim()
     if (!trimmed) return
-    const nextTasks: NoteTask[] = [{ id: newId('task'), text: trimmed, done: false }, ...current.tasks]
+    const nextTasks: NoteTask[] = [
+      { id: newId('task'), text: trimmed, colorCode: current.colorCode, done: false },
+      ...current.tasks,
+    ]
     setNewTaskText('')
     handleUpdateSelected({ tasks: nextTasks, isCompleted: false })
   }
@@ -321,7 +329,7 @@ export const NoteForge = () => {
                   }`}
                   onClick={() => handleSelectNote(n.id)}
                   role="listitem"
-                  style={{ ['--note-color' as never]: n.color }}
+                  style={{ ['--note-color' as never]: n.colorCode }}
                 >
                   <div className="nf-note-row">
                     <div className="nf-note-title">{n.title || 'Untitled'}</div>
@@ -352,7 +360,7 @@ export const NoteForge = () => {
                     <span
                       className="nf-color-dot"
                       aria-hidden="true"
-                      style={{ backgroundColor: selectedNote.color }}
+                      style={{ backgroundColor: selectedNote.colorCode }}
                     />
                     Color
                   </summary>
@@ -363,7 +371,7 @@ export const NoteForge = () => {
                         <button
                           key={c}
                           type="button"
-                          className={`nf-swatch ${selectedNote.color.toLowerCase() === c ? 'is-selected' : ''}`}
+                          className={`nf-swatch ${selectedNote.colorCode.toLowerCase() === c ? 'is-selected' : ''}`}
                           style={{ backgroundColor: c }}
                           onClick={() => handleSetSelectedColor(c)}
                           aria-label={`Set color ${c}`}
@@ -377,7 +385,7 @@ export const NoteForge = () => {
                       <input
                         className="nf-color-input"
                         type="color"
-                        value={selectedNote.color}
+                        value={selectedNote.colorCode}
                         onChange={(e) => handleSetSelectedColor(e.target.value)}
                         aria-label="Custom note color"
                       />

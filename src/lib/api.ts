@@ -14,6 +14,7 @@ export type ApiUser = {
 
 export type ApiNoteTask = {
   title: string;
+  colorCode: string;
   completed: boolean;
 };
 
@@ -122,7 +123,7 @@ export async function createNote(note: {
   });
 }
 
-export async function updateNote(noteId: string, patch: Partial<Pick<ApiNote, 'title' | 'descriptions' | 'completed' | 'tasks'>>): Promise<ApiNote> {
+export async function updateNote(noteId: string, patch: Partial<Pick<ApiNote, 'title' | 'descriptions' | 'colorCode' | 'completed' | 'tasks'>>): Promise<ApiNote> {
   return apiFetch<ApiNote>(`/notes/${encodeURIComponent(noteId)}`, {
     method: 'PATCH',
     body: JSON.stringify(patch),

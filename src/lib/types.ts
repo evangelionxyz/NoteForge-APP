@@ -4,7 +4,7 @@ export type Note = {
   content: string
   tasks: NoteTask[]
   isCompleted: boolean
-  color: string
+  colorCode: string
   createdAt: number
   updatedAt: number
 }
@@ -12,6 +12,7 @@ export type Note = {
 export type NoteTask = {
   id: string
   text: string
+  colorCode: string
   done: boolean
 }
 
