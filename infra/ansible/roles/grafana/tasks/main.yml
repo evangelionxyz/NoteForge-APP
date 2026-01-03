@@ -1,0 +1,66 @@
+---
+# Setup Grafana untuk visualisasi monitoring
+- name: Create Grafana directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/grafana
+    - /opt/grafana/provisioning
+    - /opt/grafana/provisioning/datasources
+    - /opt/grafana/provisioning/dashboards
+
+- name: Create Grafana datasource configuration
+  copy:
+    src: datasource.yml
+    dest: /opt/grafana/provisioning/datasources/prometheus.yml
+    mode: '0644'
+
+- name: Create Grafana dashboard provisioning config
+  copy:
+    src: dashboard.yml
+    dest: /opt/grafana/provisioning/dashboards/default.yml
+    mode: '0644'
+
+- name: Copy dashboard JSON files
+  copy:
+    src: "{{ item }}"
+    dest: /opt/grafana/provisioning/dashboards/
+    mode: '0644'
+  loop:
+    - node-exporter-dashboard.json
+    - app-overview-dashboard.json
+
+- name: Run Grafana container
+  community.docker.docker_container:
+    name: grafana
+    image: grafana/grafana:latest
+    state: started
+    restart_policy: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - /opt/grafana/provisioning:/etc/grafana/provisioning
+    env:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: ""
+
+- name: Wait for Grafana to be ready
+  uri:
+    url: http://localhost:3000/api/health
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 3
+
+- name: Display Grafana access information
+  debug:
+    msg:
+      - "Grafana is ready!"
+      - "URL: http://{{ ansible_host }}:3000"
+      - "Username: admin"
+      - "Password: admin123"

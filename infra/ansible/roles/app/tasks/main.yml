@@ -1,0 +1,80 @@
+---
+# Instalasi dan konfigurasi NoteForge Application
+- name: Install required packages
+  apt:
+    name:
+      - git
+      - curl
+      - python3-pip
+    state: present
+    update_cache: yes
+
+- name: Install Node.js 20.x
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
+  args:
+    creates: /usr/bin/node
+
+- name: Create application directory
+  file:
+    path: /opt/noteforge
+    state: directory
+    mode: '0755'
+
+- name: Clone NoteForge repository
+  git:
+    repo: "https://github.com/evangelionxyz/NoteForge-APP.git"
+    dest: /opt/noteforge
+    version: master
+    force: yes
+
+- name: Install npm dependencies
+  npm:
+    path: /opt/noteforge
+    state: present
+
+- name: Copy environment file
+  copy:
+    dest: /opt/noteforge/.env
+    content: |
+      VITE_FIREBASE_API_KEY="*"
+      VITE_FIREBASE_AUTH_DOMAIN="*"
+      VITE_FIREBASE_PROJECT_ID="*"
+      VITE_FIREBASE_STORAGE_BUCKET="8"
+      VITE_FIREBASE_MESSAGING_SENDER_ID="*"
+      VITE_FIREBASE_APP_ID="*"
+    mode: '0600'
+
+- name: Build NoteForge application
+  shell: npm run build
+  args:
+    chdir: /opt/noteforge
+
+- name: Create systemd service for NoteForge
+  copy:
+    dest: /etc/systemd/system/noteforge.service
+    content: |
+      [Unit]
+      Description=NoteForge Application
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=root
+      WorkingDirectory=/opt/noteforge
+      ExecStart=/usr/bin/npm run preview -- --host 0.0.0.0 --port 4173
+      Restart=always
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+
+- name: Reload systemd and enable NoteForge service
+  systemd:
+    name: noteforge
+    enabled: yes
+    state: restarted
+    daemon_reload: yes
+    

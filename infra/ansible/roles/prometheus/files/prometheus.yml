@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'noteforge-monitoring'
+
+# Alertmanager configuration (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Scrape configurations
+scrape_configs:
+  # Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Monitor Node Exporter on app servers
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets:
+          - 'localhost:9100'   # app server (localhost via host networking)
+        labels:
+          instance: 'localhost'
+          env: 'production'
+
+  # Monitor NoteForge application (if it exposes metrics)
+  - job_name: 'noteforge'
+    static_configs:
+      - targets:
+          - 'localhost:4173'   # NoteForge app (localhost via host networking)
+        labels:
+          instance: 'noteforge-localhost'
+          env: 'production'
