@@ -1,0 +1,445 @@
+.nf-app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nf-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--nf-border);
+}
+
+.nf-brand {
+  min-width: 0;
+}
+
+.nf-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.nf-subtitle {
+  margin-top: 0.15rem;
+  color: var(--nf-muted);
+  font-size: 0.9rem;
+}
+
+.nf-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.nf-user-label {
+  color: var(--nf-muted);
+  font-size: 0.8rem;
+}
+
+.nf-user-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nf-main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+}
+
+.nf-sidebar {
+  min-height: 0;
+  border-right: 1px solid var(--nf-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.nf-sidebar-top {
+  padding: 1rem;
+  border-bottom: 1px solid var(--nf-border);
+}
+
+.nf-list {
+  padding: 0.5rem;
+  overflow: auto;
+  min-height: 0;
+}
+
+.nf-note-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: transparent;
+  cursor: pointer;
+  border-left: 6px solid var(--note-color, transparent);
+}
+
+.nf-note-item:hover {
+  border-color: var(--nf-border);
+  background: color-mix(in oklab, var(--nf-surface) 70%, transparent);
+}
+
+.nf-note-item.is-selected {
+  border-color: var(--nf-border);
+  background: var(--nf-surface);
+}
+
+.nf-note-item.is-completed {
+  opacity: 0.75;
+}
+
+.nf-note-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.nf-badge {
+  font-size: 0.75rem;
+  color: var(--nf-muted);
+  border: 1px solid var(--nf-border);
+  background: color-mix(in oklab, var(--nf-surface) 80%, transparent);
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.nf-note-title {
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nf-note-meta {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--nf-muted);
+}
+
+.nf-editor {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nf-editor-top {
+  padding: 1rem;
+  border-bottom: 1px solid var(--nf-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nf-editor-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nf-popover {
+  position: relative;
+}
+
+.nf-color-trigger {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+  font: inherit;
+  line-height: 1;
+  height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+  box-sizing: border-box;
+}
+
+.nf-color-trigger::marker {
+  content: '';
+}
+
+.nf-color-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.nf-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 100%;
+  border: 1px solid var(--nf-border);
+}
+
+.nf-popover-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 20;
+  width: 260px;
+  border: 1px solid var(--nf-border);
+  border-radius: 12px;
+  background: var(--nf-bg);
+  padding: 0.75rem;
+}
+
+.nf-editor-body {
+  min-height: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.nf-editor-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nf-color-title {
+  font-weight: 650;
+  margin-bottom: 0.5rem;
+}
+
+.nf-color-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 18px);
+  gap: 0.45rem;
+}
+
+.nf-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--nf-border);
+  cursor: pointer;
+}
+
+.nf-swatch.is-selected {
+  outline: 2px solid color-mix(in oklab, currentColor 45%, transparent);
+  outline-offset: 2px;
+}
+
+.nf-color-custom {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.nf-color-label {
+  font-size: 0.85rem;
+  color: var(--nf-muted);
+}
+
+.nf-color-input {
+  border-radius: 100%;
+  border: 1px solid var(--nf-border);
+  color: inherit;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+}
+
+.nf-input {
+  width: min(320px, 46vw);
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--nf-border);
+  background: var(--nf-surface);
+  color: inherit;
+}
+
+.nf-title-input {
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--nf-border);
+  background: var(--nf-surface);
+  color: inherit;
+  font-weight: 650;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.nf-textarea {
+  flex: 1;
+  min-height: 4rem;
+  resize: none;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--nf-border);
+  background: var(--nf-surface);
+  color: inherit;
+  line-height: 1.5;
+}
+
+.nf-section {
+  border: 1px solid var(--nf-border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--nf-surface) 70%, transparent);
+  overflow: hidden;
+}
+
+.nf-section-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--nf-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.nf-section-title {
+  font-weight: 650;
+}
+
+.nf-task-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nf-task-input {
+  width: min(360px, 40vw);
+}
+
+.nf-task-list {
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.nf-task {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.35rem 0.25rem;
+}
+
+.nf-task-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.nf-task-delete {
+  border: 1px solid var(--nf-border);
+  background: transparent;
+  color: var(--nf-muted);
+  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nf-task-delete:hover {
+  background: var(--nf-surface);
+  color: inherit;
+}
+
+.nf-task.is-done .nf-task-text {
+  text-decoration: line-through;
+  color: var(--nf-muted);
+}
+
+.nf-button {
+  border-radius: 10px;
+  border: 1px solid var(--nf-border);
+  background: var(--nf-surface);
+  color: inherit;
+  padding: 0.8rem 0.85rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.nf-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.nf-button--ghost {
+  background: transparent;
+}
+
+.nf-button--danger {
+  border-color: color-mix(in oklab, var(--nf-danger) 35%, var(--nf-border));
+  color: var(--nf-danger);
+}
+
+.nf-empty {
+  padding: 1rem;
+  color: var(--nf-muted);
+}
+
+.nf-empty--editor {
+  padding: 2rem 1rem;
+}
+
+.nf-mobile-only {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .nf-main {
+    grid-template-columns: 1fr;
+  }
+
+  .nf-sidebar,
+  .nf-editor {
+    display: none;
+  }
+
+  .nf-sidebar.is-active,
+  .nf-editor.is-active {
+    display: flex;
+  }
+
+  .nf-sidebar {
+    border-right: none;
+  }
+
+  .nf-mobile-only {
+    display: inline-flex;
+  }
+
+  .nf-input {
+    width: min(320px, 70vw);
+  }
+
+  .nf-editor-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .nf-popover-panel {
+    right: auto;
+    left: 0;
+    width: min(260px, 80vw);
+  }
+
+  .nf-color-grid {
+    grid-template-columns: repeat(10, 18px);
+  }
+
+  .nf-task-input {
+    width: min(360px, 60vw);
+  }
+
+  .nf-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
