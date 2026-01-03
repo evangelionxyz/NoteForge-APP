@@ -16,7 +16,7 @@ jobs:
       VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
       VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
       VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-      DOCKERHUB_REPOSITORY: ${{ vars.DOCKERHUB_REPOSITORY }}
+      DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
 
     steps:
       - name: Checkout repository
